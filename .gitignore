@@ -3,6 +3,7 @@
 *.obj
 *.ko
 *.elf
+*.txt
 
 # Executables
 *.exe
