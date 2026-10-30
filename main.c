@@ -198,5 +198,57 @@ int dealer_no_match()
 int find_the_ace()
 {
     printf("Playing Find the Ace\n");
+    int wager;
+    printf("How many credits would you like to wager?\n");
+    scanf("%d", &wager);
+
+    if (wager <= 0 || wager > player.current_credits)
+    {
+        printf("Invalid wager.\n");
+        return -1;
+    }
+
+    int ace = (rand() % 3);
+    int choice;
+
+    printf("Type a number between 1-3\n");
+    scanf("%d", &choice);
+    choice = choice - 1;
+
+    int revealed;
+    for (int i = 0; i < 3; i++)
+    {
+        if (i != ace && i != choice)
+        {
+            revealed = i;
+            break;
+        }
+    }
+    printf("Card %d is a Queen.\n", revealed + 1);
+
+    int switch_card;
+    printf("Do you want to switch your card (1 for yes, 0 for no)?\n");
+    scanf("%d", &switch_card);
+
+    if (switch_card == 1)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (i != revealed && i != choice)
+            {
+                choice = i;
+                break;
+            }
+        }
+    }
+    if (choice == ace)
+    {
+        player.current_credits += wager;
+    }
+    else
+    {
+        player.current_credits -= wager;
+    }
+
     return 0;
 }
