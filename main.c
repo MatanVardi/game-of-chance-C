@@ -19,59 +19,37 @@ typedef SSIZE_T ssize_t;
 
 int current_game();
 int get_player_data(int uid, Player *p, char datafile[]);
-void *ec_malloc(unsigned int size);
 void fatal(char *message);
 
 int main()
 {
-    Player player;
-    Player loaded_player;
-
-    player.user_id = 1;
-    player.current_credits = 100;
-    player.high_score = 0;
-    strcpy(player.name, "Player");
-
-    // printf("The user id is: %d, the current credits num is: %d, the high score is: %d, the name is: %s",
-    //        player.user_id, player.current_credits, player.high_score, player.name);
-
-    int fd;
-
     char datafile[] = "player_data.txt";
 
+    Player player;
+    int fd;
+
+    player.user_id = 1;
+    strcpy(player.name, "Player");
     fd = open(datafile, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, _S_IREAD | _S_IWRITE);
+    write(fd, &player, sizeof(player));
 
-    if (fd == -1)
-        fatal("in main() while opening file");
-
-    if (write(fd, &player, sizeof(player)) == -1)
-        fatal("in main() while writing buffer to file");
-
+    player.user_id = 2;
+    strcpy(player.name, "Second");
+    write(fd, &player, sizeof(player));
     close(fd);
 
-    fd = open(datafile, O_RDWR);
-    read(fd, &loaded_player, sizeof(loaded_player));
-
-    loaded_player.user_id = 2;
-
-    // printf("The loaded user id is: %d, the current credits num is: %d, the high score is: %d, the name is: %s",
-    //    loaded_player.user_id, loaded_player.current_credits, loaded_player.high_score, loaded_player.name);
-
-    write(fd, &loaded_player, sizeof(loaded_player));
-
-    get_player_data(1, &player, datafile);
-    close(fd);
+    Player found;
+    if (get_player_data(99, &found, datafile) == 1)
+    {
+        printf("Found player: id=%d, name=%s, credits=%d\n",
+               found.user_id, found.name, found.current_credits);
+    }
+    else
+    {
+        printf("Player not found\n");
+    }
 
     return 0;
-}
-
-void *ec_malloc(unsigned int size)
-{
-    void *ptr;
-    ptr = malloc(size);
-    if (ptr == NULL)
-        fatal("in ec_malloc() on memory allocation");
-    return ptr;
 }
 
 void fatal(char *message)
@@ -85,7 +63,7 @@ void fatal(char *message)
 
 int get_player_data(int uid, Player *p, char datafile[])
 {
-    char line[sizeof(Player)];
+    Player current_player;
     int fd;
     ssize_t bytes_read;
 
@@ -96,16 +74,20 @@ int get_player_data(int uid, Player *p, char datafile[])
         return -1;
     }
 
-    while ((bytes_read = read(fd, line, sizeof(line))) > 0)
+    while ((bytes_read = read(fd, &current_player, sizeof(Player))) > 0)
     {
-        if (bytes_read < sizeof(Player))
+        if ((size_t)bytes_read < sizeof(Player))
         {
             break;
         }
-        Player *current_player = (Player *)line;
-        printf("User id: %d\n", current_player->user_id);
+        if (current_player.user_id == uid)
+        {
+            *p = current_player;
+            close(fd);
+            return 1;
+        }
     }
     close(fd);
 
-    return 0;
+    return -1;
 }
