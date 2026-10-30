@@ -13,12 +13,10 @@ typedef struct
     int current_credits;
     int high_score;
     char name[100];
-    int (*current_game)();
 } Player;
 
 typedef SSIZE_T ssize_t;
 
-int current_game();
 int get_player_data(int uid, Player *p, char datafile[]);
 void fatal(char *message);
 
@@ -51,6 +49,7 @@ int main()
     }
 
     bool game_is_on = true;
+    int choice;
     char menu_options[] =
         "1. Play pick a number\n"
         "2. Play no match dealer\n"
@@ -63,7 +62,6 @@ int main()
     {
         printf("%s", menu_options);
 
-        int choice;
         scanf("%d", &choice);
 
         if (choice > 7 || choice < 1)
