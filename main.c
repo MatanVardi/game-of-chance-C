@@ -13,10 +13,14 @@ typedef struct
     int current_credits;
     int high_score;
     char name[100];
+    int (*current_game)();
 } Player;
 
 typedef SSIZE_T ssize_t;
 
+int pick_a_number();
+int dealer_no_match();
+int find_the_ace();
 int get_player_data(int uid, Player *p, char datafile[]);
 void fatal(char *message);
 
@@ -31,22 +35,6 @@ int main()
     strcpy(player.name, "Player");
     fd = open(datafile, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, _S_IREAD | _S_IWRITE);
     write(fd, &player, sizeof(player));
-
-    player.user_id = 2;
-    strcpy(player.name, "Second");
-    write(fd, &player, sizeof(player));
-    close(fd);
-
-    Player found;
-    if (get_player_data(99, &found, datafile) == 1)
-    {
-        printf("Found player: id=%d, name=%s, credits=%d\n",
-               found.user_id, found.name, found.current_credits);
-    }
-    else
-    {
-        printf("Player not found\n");
-    }
 
     bool game_is_on = true;
     int choice;
@@ -72,6 +60,22 @@ int main()
         {
             game_is_on = false;
         }
+        else if (choice == 1)
+        {
+            player.current_game = pick_a_number;
+            player.current_game();
+        }
+        else if (choice == 2)
+        {
+            player.current_game = dealer_no_match;
+            player.current_game();
+        }
+        else if (choice == 3)
+        {
+            player.current_game = find_the_ace;
+            player.current_game();
+        }
+
         else
         {
             printf("The mode is not created yet\n");
@@ -119,4 +123,20 @@ int get_player_data(int uid, Player *p, char datafile[])
     close(fd);
 
     return -1;
+}
+
+int pick_a_number()
+{
+    printf("Playing Pick a Number\n");
+    return 0;
+}
+int dealer_no_match()
+{
+    printf("Playing No Match Dealer\n");
+    return 0;
+}
+int find_the_ace()
+{
+    printf("Playing Find the Ace\n");
+    return 0;
 }
