@@ -153,11 +153,48 @@ int pick_a_number()
 
     return 0;
 }
+
 int dealer_no_match()
 {
-    printf("Playing No Match Dealer\n");
+    printf("Playing Dealer no match\n");
+    printf("Enter your wanted credits to bet on\n");
+    int player_credits;
+    int arr[16];
+    int random_num;
+    int arr_length = sizeof(arr) / sizeof(arr[0]);
+    int found_pair = false;
+    scanf("%d", &player_credits);
+    if (player_credits > 0)
+    {
+        for (int i = 0; i < arr_length; i++)
+        {
+            random_num = (rand() % 100);
+            arr[i] = random_num;
+        }
+
+        for (int index = 0; index < arr_length; index++)
+        {
+            for (int j = index + 1; j < arr_length; j++)
+            {
+                if (arr[index] == arr[j])
+                {
+                    found_pair = true;
+                    player.current_credits -= player_credits;
+                    return 0;
+                }
+            }
+        }
+
+        player.current_credits += player_credits;
+    }
+    else
+    {
+        return -1;
+    }
+
     return 0;
 }
+
 int find_the_ace()
 {
     printf("Playing Find the Ace\n");
