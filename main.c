@@ -24,14 +24,16 @@ int find_the_ace();
 int get_player_data(int uid, Player *p, char datafile[]);
 void fatal(char *message);
 
+Player player;
+
 int main()
 {
     char datafile[] = "player_data.txt";
 
-    Player player;
     int fd;
 
     player.user_id = 1;
+    player.current_credits = 2000;
     strcpy(player.name, "Player");
     fd = open(datafile, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, _S_IREAD | _S_IWRITE);
     write(fd, &player, sizeof(player));
@@ -128,6 +130,27 @@ int get_player_data(int uid, Player *p, char datafile[])
 int pick_a_number()
 {
     printf("Playing Pick a Number\n");
+    if (player.current_credits < 10)
+    {
+        return -1;
+    }
+    player.current_credits -= 10;
+    int random_num = (rand() % 20) + 1;
+    int player_guess;
+
+    printf("Type a number between 1-20\n");
+    scanf("%d", &player_guess);
+
+    if (player_guess == random_num)
+    {
+        player.current_credits += 100;
+        printf("You won 100 credits\n");
+    }
+    else
+    {
+        printf("You lost!\n");
+    }
+
     return 0;
 }
 int dealer_no_match()
