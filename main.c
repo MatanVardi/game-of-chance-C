@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <io.h>
+#include <stdbool.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,6 +48,36 @@ int main()
     else
     {
         printf("Player not found\n");
+    }
+
+    bool game_is_on = true;
+    char menu_options[] =
+        "1. Play pick a number\n"
+        "2. Play no match dealer\n"
+        "3. Play find the ace\n"
+        "4. View high score\n"
+        "5. Change username\n"
+        "6. Reset account to 100 credits\n"
+        "7. Quit\n";
+    while (game_is_on)
+    {
+        printf("%s", menu_options);
+
+        int choice;
+        scanf("%d", &choice);
+
+        if (choice > 7 || choice < 1)
+        {
+            printf("Select a different choice\n");
+        }
+        else if (choice == 7)
+        {
+            game_is_on = false;
+        }
+        else
+        {
+            printf("The mode is not created yet\n");
+        }
     }
 
     return 0;
