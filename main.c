@@ -7,30 +7,29 @@
 #include <string.h>
 #include <basetsd.h>
 
-typedef struct
+typedef struct Player
 {
     int user_id;
     int current_credits;
     int high_score;
     char name[100];
-    int (*current_game)();
+    int (*current_game)(struct Player *);
 } Player;
 
 typedef SSIZE_T ssize_t;
 
-int pick_a_number();
-int dealer_no_match();
-int find_the_ace();
+int pick_a_number(Player *p);
+int dealer_no_match(Player *p);
+int find_the_ace(Player *p);
 int get_player_data(int uid, Player *p, char datafile[]);
 void fatal(char *message);
-
-Player player;
 
 int main()
 {
     char datafile[] = "player_data.txt";
-
     int fd;
+
+    Player player;
 
     player.user_id = 1;
     player.current_credits = 2000;
@@ -65,17 +64,17 @@ int main()
         else if (choice == 1)
         {
             player.current_game = pick_a_number;
-            player.current_game();
+            player.current_game(&player);
         }
         else if (choice == 2)
         {
             player.current_game = dealer_no_match;
-            player.current_game();
+            player.current_game(&player);
         }
         else if (choice == 3)
         {
             player.current_game = find_the_ace;
-            player.current_game();
+            player.current_game(&player);
         }
 
         else
@@ -127,14 +126,14 @@ int get_player_data(int uid, Player *p, char datafile[])
     return -1;
 }
 
-int pick_a_number()
+int pick_a_number(Player *p)
 {
     printf("Playing Pick a Number\n");
-    if (player.current_credits < 10)
+    if (p->current_credits < 10)
     {
         return -1;
     }
-    player.current_credits -= 10;
+    p->current_credits -= 10;
     int random_num = (rand() % 20) + 1;
     int player_guess;
 
@@ -143,7 +142,7 @@ int pick_a_number()
 
     if (player_guess == random_num)
     {
-        player.current_credits += 100;
+        p->current_credits += 100;
         printf("You won 100 credits\n");
     }
     else
@@ -154,7 +153,7 @@ int pick_a_number()
     return 0;
 }
 
-int dealer_no_match()
+int dealer_no_match(Player *p)
 {
     printf("Playing Dealer no match\n");
     printf("Enter your wanted credits to bet on\n");
@@ -179,13 +178,15 @@ int dealer_no_match()
                 if (arr[index] == arr[j])
                 {
                     found_pair = true;
-                    player.current_credits -= player_credits;
+                    p->current_credits -= player_credits;
+                    printf("You lost\n");
                     return 0;
                 }
             }
         }
+        printf("You won\n");
 
-        player.current_credits += player_credits;
+        p->current_credits += player_credits;
     }
     else
     {
@@ -195,14 +196,14 @@ int dealer_no_match()
     return 0;
 }
 
-int find_the_ace()
+int find_the_ace(Player *p)
 {
     printf("Playing Find the Ace\n");
     int wager;
     printf("How many credits would you like to wager?\n");
     scanf("%d", &wager);
 
-    if (wager <= 0 || wager > player.current_credits)
+    if (wager <= 0 || wager > p->current_credits)
     {
         printf("Invalid wager.\n");
         return -1;
@@ -243,11 +244,13 @@ int find_the_ace()
     }
     if (choice == ace)
     {
-        player.current_credits += wager;
+        printf("You found the ace\n");
+        p->current_credits += wager;
     }
     else
     {
-        player.current_credits -= wager;
+        printf("You did not find the ace\n");
+        p->current_credits -= wager;
     }
 
     return 0;
