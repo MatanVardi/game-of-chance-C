@@ -201,7 +201,7 @@ int dealer_no_match(Player *p)
     int arr_length = sizeof(arr) / sizeof(arr[0]);
     int found_pair = false;
     scanf("%d", &player_credits);
-    if (player_credits > 0)
+    if (player_credits > 0 && player_credits <= p->current_credits)
     {
         for (int i = 0; i < arr_length; i++)
         {
