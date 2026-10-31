@@ -61,13 +61,13 @@ int main()
 
         scanf("%d", &choice);
 
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF)
+            ;
+
         if (choice > 7 || choice < 1)
         {
             printf("Select a different choice\n");
-        }
-        else if (choice == 7)
-        {
-            game_is_on = false;
         }
         else if (choice == 1)
         {
@@ -84,10 +84,35 @@ int main()
             player.current_game = find_the_ace;
             player.current_game(&player);
         }
-
-        else
+        else if (choice == 4)
         {
-            printf("The mode is not created yet\n");
+            printf("High score: %d\n", player.high_score);
+        }
+        else if (choice == 5)
+        {
+            char name[50];
+
+            printf("Enter your name: \n");
+            fgets(name, sizeof(name), stdin);
+            name[strlen(name) - 1] = '\0';
+            strcpy(player.name, name);
+        }
+
+        else if (choice == 6)
+        {
+            player.current_credits = 100;
+        }
+        else if (choice == 7)
+        {
+            game_is_on = false;
+        }
+        if (player.current_credits > player.high_score)
+        {
+            player.high_score = player.current_credits;
+            fd = open(datafile, O_WRONLY | O_BINARY);
+            lseek(fd, 0, SEEK_SET);
+            write(fd, &player, sizeof(player));
+            close(fd);
         }
     }
 
@@ -95,7 +120,7 @@ int main()
     lseek(fd, 0, SEEK_SET);
     write(fd, &player, sizeof(player));
     close(fd);
-    
+
     return 0;
 }
 
