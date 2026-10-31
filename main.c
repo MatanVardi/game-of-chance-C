@@ -28,14 +28,22 @@ int main()
 {
     char datafile[] = "player_data.txt";
     int fd;
-
     Player player;
 
-    player.user_id = 1;
-    player.current_credits = 2000;
-    strcpy(player.name, "Player");
-    fd = open(datafile, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, _S_IREAD | _S_IWRITE);
-    write(fd, &player, sizeof(player));
+    if (get_player_data(1, &player, datafile) == 1)
+    {
+        printf("Copied the player stats in the file to the player struct!\n");
+    }
+    else
+    {
+        player.user_id = 1;
+        player.current_credits = 100;
+        player.high_score = 100;
+        strcpy(player.name, "Player");
+        fd = open(datafile, O_WRONLY | O_CREAT | O_BINARY, _S_IREAD | _S_IWRITE);
+        write(fd, &player, sizeof(player));
+        close(fd);
+    }
 
     bool game_is_on = true;
     int choice;
@@ -83,6 +91,11 @@ int main()
         }
     }
 
+    fd = open(datafile, O_WRONLY | O_BINARY);
+    lseek(fd, 0, SEEK_SET);
+    write(fd, &player, sizeof(player));
+    close(fd);
+    
     return 0;
 }
 
